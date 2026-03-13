@@ -102,19 +102,7 @@
     margin: 1.5rem auto 0;
   }
 
-  /* RANKING NOTE */
-  .ranking-note {
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-left: 3px solid var(--gold);
-    border-radius: 8px;
-    padding: 1rem 1.25rem;
-    margin-bottom: 2rem;
-    font-size: 13px;
-    color: var(--text-muted);
-    line-height: 1.7;
-  }
-  .ranking-note strong { color: var(--text); font-weight: 500; }
+
 
   /* GRID */
   .grid {
@@ -257,30 +245,32 @@
     font-size: 9px;
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    color: var(--text-dim);
-    margin-bottom: 3px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
   }
   .stat-input {
     width: 100%;
-    background: var(--surface2);
-    border: 0.5px solid var(--border);
-    border-radius: 6px;
-    color: var(--text);
-    font-family: 'Barlow', sans-serif;
-    font-size: 15px;
-    font-weight: 500;
+    background: #F5F0E8;
+    border: none;
+    border-radius: 8px;
+    color: #1A1710;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 1px;
     text-align: center;
-    padding: 6px 4px;
-    transition: border-color 0.2s, background 0.2s;
+    padding: 7px 4px 5px;
+    transition: background 0.2s, box-shadow 0.2s;
     -moz-appearance: textfield;
     appearance: textfield;
+    line-height: 1;
   }
   .stat-input::-webkit-inner-spin-button,
   .stat-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .stat-input:hover { background: #EDE8DC; }
   .stat-input:focus {
     outline: none;
-    border-color: var(--gold);
-    background: var(--surface3);
+    background: #fff;
+    box-shadow: 0 0 0 2px var(--gold);
   }
 
   /* TOTALS */
@@ -297,16 +287,16 @@
     font-size: 9px;
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    color: var(--text-dim);
-    margin-bottom: 2px;
+    color: var(--text-muted);
+    margin-bottom: 3px;
   }
   .total-val {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 30px;
+    font-size: 36px;
     line-height: 1;
     color: var(--text);
   }
-  .card[data-rank="1"] .total-val { color: var(--gold-light); }
+  .card[data-rank="1"] .total-val { color: var(--gold-light); text-shadow: 0 0 20px rgba(242,201,76,0.3); }
   .card[data-rank="2"] .total-val { color: var(--silver-light); }
   .card[data-rank="3"] .total-val { color: var(--bronze-light); }
 
@@ -322,16 +312,7 @@
     letter-spacing: 0.3px;
   }
 
-  /* RANKING NOTE INLINE */
-  .ranking-reason {
-    font-size: 11px;
-    color: var(--text-dim);
-    margin-top: 10px;
-    padding-top: 8px;
-    border-top: 0.5px solid var(--border);
-    line-height: 1.5;
-    font-style: italic;
-  }
+
 
   /* FOOTER */
   footer {
@@ -366,9 +347,6 @@
     <div class="header-divider"></div>
   </header>
 
-  <div class="ranking-note">
-    <strong>Mi ranking:</strong> Ordenados según rendimiento ofensivo combinado (goles + asistencias), consistencia en club y selección, y aportación en trofeos. Las stats son editables y se <strong>guardan automáticamente</strong> en tu navegador.
-  </div>
 
   <div class="grid" id="grid"></div>
 
@@ -378,14 +356,6 @@
 <script>
 const STORAGE_KEY = 'bdo2026_stats_v2';
 
-const REASONS = [
-  "Máximo goleador de la temporada con 50 goles entre club y selección. Kane combina volumen, constancia y liderazgo: el Balón de Oro sería suyo si la votación fuera hoy.",
-  "43 goles en temporada con Real Madrid en modo candidato. El talento puro de Mbappé en su primer año en Madrid lo pone justo detrás de Kane.",
-  "42 goles totales y récord individual otra vez. Sin trofeo colectivo relevante aún, pero su dominio personal es innegable.",
-  "20 goles y 17 asistencias con solo 17 años. El impacto de Yamal por edad, creatividad y clutch en la Roja lo hace candidato histórico.",
-  "16 goles y 22 asistencias: mejor asistidor del grupo. Olise es el motor creativo del Bayern, pero le falta el reconocimiento global.",
-  "Temporada discreta para sus estándares: 14 goles y 12 asistencias. El gran Vini necesita más para defender su candidatura."
-];
 
 const defaultPlayers = [
   {
@@ -579,8 +549,6 @@ function renderAll() {
         </div>
 
         ${p.trophies.length ? `<div class="trophies">${p.trophies.map(t => `<span class="trophy-chip">&#9733; ${t}</span>`).join('')}</div>` : ''}
-
-        <div class="ranking-reason">${REASONS[rankIdx]}</div>
       </div>
     `;
 
