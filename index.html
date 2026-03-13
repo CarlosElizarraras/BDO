@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Balón de Oro 2025/26</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #D4A017;
+    --gold-light: #F2C94C;
+    --gold-pale: #FBF0CC;
+    --silver: #9BA3AF;
+    --silver-light: #C8CDD5;
+    --bronze: #B5651D;
+    --bronze-light: #D4854D;
+    --bg: #0A0A0C;
+    --surface: #121218;
+    --surface2: #1A1A24;
+    --surface3: #22222E;
+    --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(255,255,255,0.15);
+    --text: #F0EEE8;
+    --text-muted: #8A8880;
+    --text-dim: #4A4845;
+    --accent: #C8A415;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* BG Pattern */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse 60% 40% at 20% 10%, rgba(212,160,23,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 80% 90%, rgba(212,160,23,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  header {
+    text-align: center;
+    padding: 3.5rem 1rem 2.5rem;
+    position: relative;
+  }
+  .header-eyebrow {
+    font-size: 11px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+    opacity: 0.8;
+  }
+  .header-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 12vw, 96px);
+    letter-spacing: 3px;
+    color: var(--text);
+    line-height: 0.9;
+    position: relative;
+    display: inline-block;
+  }
+  .header-title span {
+    background: linear-gradient(135deg, var(--gold-light), var(--gold), #8B6000);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header-season {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 1rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .header-divider {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 1.5rem auto 0;
+  }
+
+  /* RANKING NOTE */
+  .ranking-note {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 2rem;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+  .ranking-note strong { color: var(--text); font-weight: 500; }
+
+  /* GRID */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.2s;
+    position: relative;
+    animation: cardIn 0.5s ease both;
+  }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+
+  .card[data-rank="1"] { border-color: rgba(212,160,23,0.4); }
+  .card[data-rank="2"] { border-color: rgba(155,163,175,0.35); }
+  .card[data-rank="3"] { border-color: rgba(181,101,29,0.35); }
+
+  .card-top-bar {
+    height: 3px;
+    width: 100%;
+  }
+  .card[data-rank="1"] .card-top-bar { background: linear-gradient(90deg, #8B6000, #F2C94C, #D4A017, #F2C94C, #8B6000); }
+  .card[data-rank="2"] .card-top-bar { background: linear-gradient(90deg, #5A6070, #C8CDD5, #9BA3AF, #C8CDD5, #5A6070); }
+  .card[data-rank="3"] .card-top-bar { background: linear-gradient(90deg, #6B3D10, #D4854D, #B5651D, #D4854D, #6B3D10); }
+  .card-top-bar-default { background: var(--border); }
+
+  /* PLAYER PHOTO AREA */
+  .card-hero {
+    position: relative;
+    height: 160px;
+    background: var(--surface2);
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+  }
+  .card-hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 80px;
+    background: linear-gradient(to top, var(--surface), transparent);
+    z-index: 2;
+  }
+  .player-img {
+    position: absolute;
+    right: 10px;
+    bottom: 0;
+    height: 155px;
+    width: auto;
+    object-fit: contain;
+    object-position: bottom;
+    z-index: 1;
+    filter: drop-shadow(0 4px 20px rgba(0,0,0,0.5));
+    transition: transform 0.3s;
+  }
+  .card:hover .player-img { transform: scale(1.03) translateY(-3px); }
+
+  .rank-badge {
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    z-index: 3;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0;
+  }
+  .rank-1 { background: linear-gradient(135deg, #F2C94C, #D4A017); color: #3A2500; box-shadow: 0 0 16px rgba(212,160,23,0.5); }
+  .rank-2 { background: linear-gradient(135deg, #C8CDD5, #9BA3AF); color: #2A2E38; }
+  .rank-3 { background: linear-gradient(135deg, #D4854D, #B5651D); color: #3A1800; }
+  .rank-other { background: var(--surface3); color: var(--text-muted); border: 0.5px solid var(--border); }
+
+  .hero-info {
+    position: absolute;
+    bottom: 12px;
+    left: 14px;
+    z-index: 3;
+  }
+  .player-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 1px;
+    line-height: 1;
+    color: var(--text);
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  }
+  .player-team {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 2px;
+  }
+
+  /* CARD BODY */
+  .card-body { padding: 1rem; }
+
+  .section-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 0.5px;
+    background: var(--border);
+  }
+  .section-label:first-child { margin-top: 0; }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+  }
+  .stat-box { text-align: center; }
+  .stat-label-sm {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    margin-bottom: 3px;
+  }
+  .stat-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    text-align: center;
+    padding: 6px 4px;
+    transition: border-color 0.2s, background 0.2s;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  .stat-input::-webkit-inner-spin-button,
+  .stat-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .stat-input:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: var(--surface3);
+  }
+
+  /* TOTALS */
+  .totals-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 0.5px solid var(--border);
+  }
+  .total-item { text-align: center; }
+  .total-label-sm {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    margin-bottom: 2px;
+  }
+  .total-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 30px;
+    line-height: 1;
+    color: var(--text);
+  }
+  .card[data-rank="1"] .total-val { color: var(--gold-light); }
+  .card[data-rank="2"] .total-val { color: var(--silver-light); }
+  .card[data-rank="3"] .total-val { color: var(--bronze-light); }
+
+  /* TROPHIES */
+  .trophies { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+  .trophy-chip {
+    font-size: 10px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    background: rgba(212,160,23,0.1);
+    border: 0.5px solid rgba(212,160,23,0.3);
+    color: var(--gold-light);
+    letter-spacing: 0.3px;
+  }
+
+  /* RANKING NOTE INLINE */
+  .ranking-reason {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 0.5px solid var(--border);
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding-top: 2rem;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    border-top: 0.5px solid var(--border);
+    margin-top: 2rem;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 480px) {
+    .grid { grid-template-columns: 1fr; }
+    .header-title { font-size: 52px; }
+    .card-hero { height: 140px; }
+    .player-img { height: 130px; }
+  }
+  @media (min-width: 900px) {
+    .grid { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="header-eyebrow">&#9733; Candidatos</div>
+    <div class="header-title">Balón<br>de <span>Oro</span></div>
+    <div class="header-season">Temporada 2025 · 2026</div>
+    <div class="header-divider"></div>
+  </header>
+
+  <div class="ranking-note">
+    <strong>Mi ranking:</strong> Ordenados según rendimiento ofensivo combinado (goles + asistencias), consistencia en club y selección, y aportación en trofeos. Las stats son editables y se <strong>guardan automáticamente</strong> en tu navegador.
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <footer>PJ · Partidos jugados &nbsp;|&nbsp; GLS · Goles &nbsp;|&nbsp; AST · Asistencias &nbsp;|&nbsp; Stats se guardan localmente</footer>
+</div>
+
+<script>
+const STORAGE_KEY = 'bdo2026_stats_v2';
+
+const REASONS = [
+  "Máximo goleador de la temporada con 50 goles entre club y selección. Kane combina volumen, constancia y liderazgo: el Balón de Oro sería suyo si la votación fuera hoy.",
+  "43 goles en temporada con Real Madrid en modo candidato. El talento puro de Mbappé en su primer año en Madrid lo pone justo detrás de Kane.",
+  "42 goles totales y récord individual otra vez. Sin trofeo colectivo relevante aún, pero su dominio personal es innegable.",
+  "20 goles y 17 asistencias con solo 17 años. El impacto de Yamal por edad, creatividad y clutch en la Roja lo hace candidato histórico.",
+  "16 goles y 22 asistencias: mejor asistidor del grupo. Olise es el motor creativo del Bayern, pero le falta el reconocimiento global.",
+  "Temporada discreta para sus estándares: 14 goles y 12 asistencias. El gran Vini necesita más para defender su candidatura."
+];
+
+const defaultPlayers = [
+  {
+    id: "kane",
+    name: "Harry Kane", initials: "HK",
+    club: "Bayern Múnich", nat: "Inglaterra",
+    img: "https://images.fotmob.com/image_resources/playerimages/194165.png",
+    clubStats: { pj: 37, gls: 45, ast: 5 },
+    natStats: { pj: 4, gls: 5, ast: 0 },
+    trophies: ["Supercopa de Alemania"]
+  },
+  {
+    id: "mbappe",
+    name: "Kylian Mbappé", initials: "KM",
+    club: "Real Madrid", nat: "Francia",
+    img: "https://images.fotmob.com/image_resources/playerimages/701154.png",
+    clubStats: { pj: 33, gls: 38, ast: 5 },
+    natStats: { pj: 4, gls: 5, ast: 3 },
+    trophies: []
+  },
+  {
+    id: "haaland",
+    name: "Erling Haaland", initials: "EH",
+    club: "Manchester City", nat: "Noruega",
+    img: "https://images.fotmob.com/image_resources/playerimages/737066.png",
+    clubStats: { pj: 40, gls: 29, ast: 7 },
+    natStats: { pj: 5, gls: 13, ast: 2 },
+    trophies: []
+  },
+  {
+    id: "yamal",
+    name: "Lamine Yamal", initials: "LY",
+    club: "Barcelona", nat: "España",
+    img: "https://images.fotmob.com/image_resources/playerimages/1467236.png",
+    clubStats: { pj: 37, gls: 20, ast: 14 },
+    natStats: { pj: 2, gls: 0, ast: 3 },
+    trophies: ["Supercopa de España"]
+  },
+  {
+    id: "olise",
+    name: "Michael Olise", initials: "MO",
+    club: "Bayern Múnich", nat: "Francia",
+    img: "https://images.fotmob.com/image_resources/playerimages/1029063.png",
+    clubStats: { pj: 37, gls: 15, ast: 22 },
+    natStats: { pj: 5, gls: 1, ast: 0 },
+    trophies: ["Supercopa de Alemania"]
+  },
+  {
+    id: "vini",
+    name: "Vinicius Jr.", initials: "VJ",
+    club: "Real Madrid", nat: "Brasil",
+    img: "https://images.fotmob.com/image_resources/playerimages/846033.png",
+    clubStats: { pj: 40, gls: 13, ast: 11 },
+    natStats: { pj: 4, gls: 1, ast: 1 },
+    trophies: []
+  }
+];
+
+// Load from localStorage or use defaults
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultPlayers.map(p => JSON.parse(JSON.stringify(p)));
+    const saved = JSON.parse(raw);
+    // Merge saved stats into defaults to preserve any new fields
+    return defaultPlayers.map(p => {
+      const found = saved.find(s => s.id === p.id);
+      if (found) {
+        return {
+          ...p,
+          clubStats: { ...found.clubStats },
+          natStats: { ...found.natStats }
+        };
+      }
+      return JSON.parse(JSON.stringify(p));
+    });
+  } catch(e) {
+    return defaultPlayers.map(p => JSON.parse(JSON.stringify(p)));
+  }
+}
+
+function saveData(players) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(
+      players.map(p => ({ id: p.id, clubStats: p.clubStats, natStats: p.natStats }))
+    ));
+  } catch(e) {}
+}
+
+function score(p) {
+  const gls = p.clubStats.gls + p.natStats.gls;
+  const ast = p.clubStats.ast + p.natStats.ast;
+  const pj = p.clubStats.pj + p.natStats.pj;
+  // Weighted: goals count more, assists secondary, slight efficiency bonus
+  return gls * 1 + ast * 0.5 + (pj > 0 ? (gls / pj) * 3 : 0);
+}
+
+function sortByScore(players) {
+  return [...players].sort((a, b) => score(b) - score(a));
+}
+
+let players = loadData();
+
+function renderAll() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+
+  const sorted = sortByScore(players);
+
+  sorted.forEach((p, rankIdx) => {
+    const rank = rankIdx + 1;
+    const tot = {
+      pj: p.clubStats.pj + p.natStats.pj,
+      gls: p.clubStats.gls + p.natStats.gls,
+      ast: p.clubStats.ast + p.natStats.ast
+    };
+
+    const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-other';
+    const barClass = rank <= 3 ? '' : 'card-top-bar-default';
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.rank = rank;
+    card.style.animationDelay = `${rankIdx * 0.07}s`;
+
+    card.innerHTML = `
+      <div class="card-top-bar ${barClass}"></div>
+
+      <div class="card-hero">
+        <img class="player-img" src="${p.img}" alt="${p.name}" loading="lazy"
+             onerror="this.style.opacity='0.3'">
+        <div class="rank-badge ${rankClass}">${rank}</div>
+        <div class="hero-info">
+          <div class="player-name">${p.name}</div>
+          <div class="player-team">${p.club}</div>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="section-label">${p.club}</div>
+        <div class="stat-row">
+          <div class="stat-box">
+            <div class="stat-label-sm">PJ</div>
+            <input class="stat-input" type="number" min="0" value="${p.clubStats.pj}"
+              data-id="${p.id}" data-team="clubStats" data-stat="pj">
+          </div>
+          <div class="stat-box">
+            <div class="stat-label-sm">GLS</div>
+            <input class="stat-input" type="number" min="0" value="${p.clubStats.gls}"
+              data-id="${p.id}" data-team="clubStats" data-stat="gls">
+          </div>
+          <div class="stat-box">
+            <div class="stat-label-sm">AST</div>
+            <input class="stat-input" type="number" min="0" value="${p.clubStats.ast}"
+              data-id="${p.id}" data-team="clubStats" data-stat="ast">
+          </div>
+        </div>
+
+        <div class="section-label">${p.nat}</div>
+        <div class="stat-row">
+          <div class="stat-box">
+            <div class="stat-label-sm">PJ</div>
+            <input class="stat-input" type="number" min="0" value="${p.natStats.pj}"
+              data-id="${p.id}" data-team="natStats" data-stat="pj">
+          </div>
+          <div class="stat-box">
+            <div class="stat-label-sm">GLS</div>
+            <input class="stat-input" type="number" min="0" value="${p.natStats.gls}"
+              data-id="${p.id}" data-team="natStats" data-stat="gls">
+          </div>
+          <div class="stat-box">
+            <div class="stat-label-sm">AST</div>
+            <input class="stat-input" type="number" min="0" value="${p.natStats.ast}"
+              data-id="${p.id}" data-team="natStats" data-stat="ast">
+          </div>
+        </div>
+
+        <div class="totals-area">
+          <div class="total-item">
+            <div class="total-label-sm">Total PJ</div>
+            <div class="total-val" id="tot-pj-${p.id}">${tot.pj}</div>
+          </div>
+          <div class="total-item">
+            <div class="total-label-sm">Total GLS</div>
+            <div class="total-val" id="tot-gls-${p.id}">${tot.gls}</div>
+          </div>
+          <div class="total-item">
+            <div class="total-label-sm">Total AST</div>
+            <div class="total-val" id="tot-ast-${p.id}">${tot.ast}</div>
+          </div>
+        </div>
+
+        ${p.trophies.length ? `<div class="trophies">${p.trophies.map(t => `<span class="trophy-chip">&#9733; ${t}</span>`).join('')}</div>` : ''}
+
+        <div class="ranking-reason">${REASONS[rankIdx]}</div>
+      </div>
+    `;
+
+    grid.appendChild(card);
+  });
+
+  // Events
+  grid.querySelectorAll('.stat-input').forEach(input => {
+    input.addEventListener('input', function() {
+      const id = this.dataset.id;
+      const team = this.dataset.team;
+      const stat = this.dataset.stat;
+      const val = Math.max(0, parseInt(this.value) || 0);
+
+      const player = players.find(p => p.id === id);
+      if (!player) return;
+      player[team][stat] = val;
+
+      const tot = {
+        pj: player.clubStats.pj + player.natStats.pj,
+        gls: player.clubStats.gls + player.natStats.gls,
+        ast: player.clubStats.ast + player.natStats.ast
+      };
+
+      const pjEl = document.getElementById(`tot-pj-${id}`);
+      const glsEl = document.getElementById(`tot-gls-${id}`);
+      const astEl = document.getElementById(`tot-ast-${id}`);
+      if (pjEl) pjEl.textContent = tot.pj;
+      if (glsEl) glsEl.textContent = tot.gls;
+      if (astEl) astEl.textContent = tot.ast;
+
+      saveData(players);
+
+      // Re-render after brief pause to let user finish typing
+      clearTimeout(window._reorderTimer);
+      window._reorderTimer = setTimeout(() => {
+        renderAll();
+      }, 1200);
+    });
+  });
+}
+
+renderAll();
+</script>
+</body>
+</html>
