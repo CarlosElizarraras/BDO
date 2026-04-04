@@ -301,16 +301,69 @@
   .card[data-rank="3"] .total-val { color: var(--bronze-light); }
 
   /* TROPHIES */
-  .trophies { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+  .trophies-section { margin-top: 10px; }
+  .trophies { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; min-height: 4px; }
   .trophy-chip {
     font-size: 10px;
-    padding: 3px 9px;
+    padding: 3px 6px 3px 9px;
     border-radius: 20px;
     background: rgba(212,160,23,0.1);
     border: 0.5px solid rgba(212,160,23,0.3);
     color: var(--gold-light);
     letter-spacing: 0.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
   }
+  .trophy-delete {
+    background: none;
+    border: none;
+    color: rgba(212,160,23,0.5);
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s;
+  }
+  .trophy-delete:hover { color: #ff6b6b; }
+  .trophy-add-row {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    margin-top: 4px;
+  }
+  .trophy-text-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 11px;
+    padding: 5px 9px;
+    transition: border-color 0.2s;
+    min-width: 0;
+  }
+  .trophy-text-input::placeholder { color: var(--text-dim); }
+  .trophy-text-input:focus {
+    outline: none;
+    border-color: rgba(212,160,23,0.5);
+  }
+  .trophy-add-btn {
+    background: rgba(212,160,23,0.12);
+    border: 0.5px solid rgba(212,160,23,0.3);
+    border-radius: 8px;
+    color: var(--gold-light);
+    font-size: 16px;
+    line-height: 1;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .trophy-add-btn:hover { background: rgba(212,160,23,0.22); }
 
 
 
@@ -427,7 +480,8 @@ function loadData() {
         return {
           ...p,
           clubStats: { ...found.clubStats },
-          natStats: { ...found.natStats }
+          natStats: { ...found.natStats },
+          trophies: found.trophies !== undefined ? [...found.trophies] : [...p.trophies]
         };
       }
       return JSON.parse(JSON.stringify(p));
@@ -440,7 +494,7 @@ function loadData() {
 function saveData(players) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(
-      players.map(p => ({ id: p.id, clubStats: p.clubStats, natStats: p.natStats }))
+      players.map(p => ({ id: p.id, clubStats: p.clubStats, natStats: p.natStats, trophies: p.trophies }))
     ));
   } catch(e) {}
 }
@@ -455,6 +509,23 @@ function score(p) {
 
 function sortByScore(players) {
   return [...players].sort((a, b) => score(b) - score(a));
+}
+
+function attachTrophyDeleteListeners(container) {
+  container.querySelectorAll('.trophy-delete').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const id = this.dataset.id;
+      const tidx = parseInt(this.dataset.tidx);
+      const player = players.find(p => p.id === id);
+      if (!player) return;
+      player.trophies.splice(tidx, 1);
+      saveData(players);
+      container.innerHTML = player.trophies.map((t, i) =>
+        `<span class="trophy-chip">&#9733; ${t}<button class="trophy-delete" data-id="${id}" data-tidx="${i}" title="Eliminar">&#x2715;</button></span>`
+      ).join('');
+      attachTrophyDeleteListeners(container);
+    });
+  });
 }
 
 let players = loadData();
@@ -548,14 +619,69 @@ function renderAll() {
           </div>
         </div>
 
-        ${p.trophies.length ? `<div class="trophies">${p.trophies.map(t => `<span class="trophy-chip">&#9733; ${t}</span>`).join('')}</div>` : ''}
+        ${(() => {
+          const chips = p.trophies.map((t, i) =>
+            `<span class="trophy-chip">&#9733; ${t}<button class="trophy-delete" data-id="${p.id}" data-tidx="${i}" title="Eliminar">&#x2715;</button></span>`
+          ).join('');
+          return `<div class="trophies-section">
+            <div class="section-label">Títulos</div>
+            <div class="trophies" id="trophies-${p.id}">${chips}</div>
+            <div class="trophy-add-row">
+              <input class="trophy-text-input" type="text" id="trophy-input-${p.id}" placeholder="Nuevo título…" maxlength="60">
+              <button class="trophy-add-btn" data-id="${p.id}" title="Agregar">+</button>
+            </div>
+          </div>`;
+        })()}
       </div>
     `;
 
     grid.appendChild(card);
   });
 
-  // Events
+  // Trophy: Add
+  grid.querySelectorAll('.trophy-add-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const id = this.dataset.id;
+      const input = document.getElementById(`trophy-input-${id}`);
+      const val = input.value.trim();
+      if (!val) return;
+      const player = players.find(p => p.id === id);
+      if (!player) return;
+      player.trophies.push(val);
+      saveData(players);
+      input.value = '';
+      // Refresh only the trophies area without full re-render
+      const container = document.getElementById(`trophies-${id}`);
+      container.innerHTML = player.trophies.map((t, i) =>
+        `<span class="trophy-chip">&#9733; ${t}<button class="trophy-delete" data-id="${id}" data-tidx="${i}" title="Eliminar">&#x2715;</button></span>`
+      ).join('');
+      attachTrophyDeleteListeners(container);
+    });
+    // Also allow Enter key on input
+    const id = btn.dataset.id;
+    const input = document.getElementById(`trophy-input-${id}`);
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') btn.click();
+    });
+  });
+
+  // Trophy: Delete
+  grid.querySelectorAll('.trophy-delete').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const id = this.dataset.id;
+      const tidx = parseInt(this.dataset.tidx);
+      const player = players.find(p => p.id === id);
+      if (!player) return;
+      player.trophies.splice(tidx, 1);
+      saveData(players);
+      const container = document.getElementById(`trophies-${id}`);
+      container.innerHTML = player.trophies.map((t, i) =>
+        `<span class="trophy-chip">&#9733; ${t}<button class="trophy-delete" data-id="${id}" data-tidx="${i}" title="Eliminar">&#x2715;</button></span>`
+      ).join('');
+      attachTrophyDeleteListeners(container);
+    });
+  });
+  // Stats: Edit
   grid.querySelectorAll('.stat-input').forEach(input => {
     input.addEventListener('input', function() {
       const id = this.dataset.id;
